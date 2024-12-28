@@ -401,19 +401,14 @@ Make sure to return an instance of the JSON, not the schema itself.""")
         for action in actions:
             action_input_schemas.append(f" * {action.name} {action.format_schema_for_llm()}")
             
-        system_prompt += dedent(f"""\n# Response format
-
-Use the following format:
-
-Thought: You should always think about what to do
-Action: The action to take followed by the input arguments based on the schema below
-
-Use one of the following actions and provide input arguments matching the schema.
-                            
-{'\n\n'.join(action_input_schemas)}
-
-Important: Do not include multiple Thought-Action blocks. Do not include code blocks or additional text outside of this format.
-""")
+        system_prompt += '\n# Response format\n'
+        + 'Use the following format:\n\n'
+        + 'Thought: You should always think about what to do\n'
+        + 'Action: The action to take followed by the input arguments based on the schema below\n\n'
+        + 'Use one of the following actions and provide input arguments matching the schema.\n\n'
+        + '\n\n'.join(action_input_schemas)
+        + '\n\n'
+        + 'Important: Do not include multiple Thought-Action blocks. Do not include code blocks or additional text outside of this format.'
 
         messages.insert(0, {"role": "system", "content": system_prompt})
 
