@@ -7,6 +7,10 @@ from moatless.file_context import FileContext
 from moatless.index import CodeIndex
 from moatless.search_tree import SearchTree
 from moatless.actions import FindClass, FindFunction, FindCodeSnippet, SemanticSearch, ViewCode, StringReplace, CreateFile, AppendString, RunTests, Finish, Reject
+import os
+import dotenv
+
+dotenv.load_dotenv()
 
 index_store_dir = "/tmp/index_store"
 repo_base_dir = "/tmp/repos"
@@ -14,7 +18,12 @@ persist_path = "trajectory.json"
 
 instance = get_moatless_instance("django__django-16379")
 
-completion_model = CompletionModel(model="gpt-4o", temperature=0.0)
+completion_model = CompletionModel(
+    model="openai/accounts/fireworks/models/llama-v3p1-405b-instruct",
+    temperature=0.0,
+    model_base_url=os.getenv("CUSTOM_LLM_API_BASE"),
+    model_api_key=os.getenv("CUSTOM_LLM_API_KEY")
+)
 
 repository = create_repository(instance)
 
@@ -37,7 +46,12 @@ actions = [
 ]
 
 file_context = FileContext(repo=repository)
-agent = CodingAgent(actions=actions, completion=completion_model, system_prompt=SIMPLE_CODE_PROMPT)
+agent = CodingAgent(
+    actions=actions,
+    completion=completion_model,
+    system_prompt=SIMPLE_CODE_PROMPT,
+
+)
 
 search_tree = SearchTree.create(
     message=instance["problem_statement"],
